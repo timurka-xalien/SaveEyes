@@ -59,10 +59,14 @@
             // 
             // icoTray
             // 
+            this.icoTray.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.icoTray.BalloonTipText = ".";
+            this.icoTray.BalloonTipTitle = "Next long rest in";
             this.icoTray.ContextMenuStrip = this.mnuTrayMenu;
             this.icoTray.Icon = ((System.Drawing.Icon)(resources.GetObject("icoTray.Icon")));
             this.icoTray.Text = "Save Eyes";
             this.icoTray.Visible = true;
+            this.icoTray.MouseMove += new System.Windows.Forms.MouseEventHandler(this.icoTray_MouseMove);
             // 
             // mnuTrayMenu
             // 
@@ -112,13 +116,13 @@
             this.pictureBox1.TabIndex = 1;
             this.pictureBox1.TabStop = false;
             // 
-            // lblRestEndsIn
+            // lblLongRestEndsIn
             // 
             this.lblLongRestEndsIn.AutoSize = true;
             this.lblLongRestEndsIn.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.lblLongRestEndsIn.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
             this.lblLongRestEndsIn.Location = new System.Drawing.Point(155, 294);
-            this.lblLongRestEndsIn.Name = "lblRestEndsIn";
+            this.lblLongRestEndsIn.Name = "lblLongRestEndsIn";
             this.lblLongRestEndsIn.Size = new System.Drawing.Size(76, 29);
             this.lblLongRestEndsIn.TabIndex = 2;
             this.lblLongRestEndsIn.Text = "05:00";

@@ -11,7 +11,7 @@ namespace WindowsFormsApplication1
     {
         private readonly TimeSpan AutoReenableInterval = TimeSpan.FromHours(1);
         private readonly TimeSpan ShortRestInterval = TimeSpan.FromMinutes(5);
-        private readonly TimeSpan LongRestInterval = TimeSpan.FromMinutes(0.1);
+        private readonly TimeSpan LongRestInterval = TimeSpan.FromMinutes(30);
         // ShortRestDuration is the same
         private readonly TimeSpan _timerResolutionInterval;
         private readonly TimeSpan _longRestDuration;
@@ -114,11 +114,20 @@ namespace WindowsFormsApplication1
 
         private bool IsTimeToLongRest()
         {
-            Trace.WriteLine($"Next long rest {_lastLongRestTime + LongRestInterval}");
+            DateTime nextLongRest = GetNextLongRestStart();
+
+            Trace.WriteLine($"Next long rest {nextLongRest}");
 
             return !Visible &&
                 _allowLongRest &&
-                _lastLongRestTime + LongRestInterval < DateTime.Now;
+                nextLongRest < DateTime.Now;
+        }
+
+        private DateTime GetNextLongRestStart()
+        {
+            return _allowLongRest 
+                ? _lastLongRestTime + LongRestInterval
+                : DateTime.MaxValue;
         }
 
         private bool IsTimeToShortRest()
@@ -199,6 +208,19 @@ namespace WindowsFormsApplication1
             {
                 _longRestEndsIn = _longRestEndsIn - TimeSpan.FromSeconds(1);
                 lblLongRestEndsIn.Text = _longRestEndsIn.ToString(@"mm\:ss");
+            }
+        }
+
+        private void icoTray_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_allowLongRest)
+            {
+                var timeToNextLongRest = GetNextLongRestStart() - DateTime.Now;
+                icoTray.Text = "Next long rest in:\r\n " + timeToNextLongRest.ToString(@"mm\:ss");
+            }
+            else
+            {
+                icoTray.Text = "DISABLED";
             }
         }
     }

@@ -5,3 +5,4 @@
 /bin/Debug
 /obj/Debug
 *.suo
+/.vs/SaveEyes/v15/Server/sqlite3/db.lock
