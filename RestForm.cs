@@ -233,6 +233,12 @@ namespace WindowsFormsApplication1
 
         private void icoTray_MouseMove(object sender, MouseEventArgs e)
         {
+            if (_inLongRest)
+            {
+                icoTray.Text = "LONG REST";
+                return;
+            }
+
             if (_allowLongRest)
             {
                 var timeToNextLongRest = GetNextLongRestStart() - DateTime.Now;
