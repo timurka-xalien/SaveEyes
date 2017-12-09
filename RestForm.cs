@@ -9,40 +9,40 @@ namespace WindowsFormsApplication1
 {
     public partial class RestForm : Form
     {
+        // ShortRestDuration is the same
+        private TimeSpan _timerResolutionInterval;
         private readonly TimeSpan AutoReenableInterval = TimeSpan.FromHours(1);
         private readonly TimeSpan ShortRestInterval = TimeSpan.FromMinutes(5);
-        private readonly TimeSpan LongRestInterval = TimeSpan.FromMinutes(30);
-        // ShortRestDuration is the same
-        private readonly TimeSpan _timerResolutionInterval;
-        private readonly TimeSpan _longRestDuration;
 
+        private TimeSpan _longRestInterval;
+        private TimeSpan _longRestDuration;
         private TimeSpan _longRestEndsIn;
+        private bool _allowLongRest = true;
+        private bool _inLongRest = false;
 
-        private DateTime _lastShortRestTime = DateTime.Now;
-        private DateTime _lastLongRestTime = DateTime.Now;
+        private DateTime _lastShortRestTime;
+        private DateTime _lastLongRestTime;
         private DateTime _lastDisableTime = DateTime.MaxValue;
 
         private bool _enabled = true;
-        private bool _allowLongRest = true;
-        private bool _inLongRest = false;
         private int _lastIndex;
 
         public RestForm()
         {
-            _timerResolutionInterval = TimeSpan.Parse(ConfigurationManager.AppSettings["ShortRestDuration"]);
-            _longRestDuration = TimeSpan.Parse(ConfigurationManager.AppSettings["LongRestDuration"]);
-
             InitializeComponent();
 
             InitializeDefaultTimerInterval();
-
+            SetLongRestParametersFromConfig();
             SetImage();
+            ResetLastLongRestTime();
+            ResetLastShortRestTime();
 
             Visible = false;
         }
 
         private void InitializeDefaultTimerInterval()
         {
+            _timerResolutionInterval = TimeSpan.Parse(ConfigurationManager.AppSettings["ShortRestDuration"]);
             timer.Interval = (int)_timerResolutionInterval.TotalMilliseconds;
         }
 
@@ -82,12 +82,25 @@ namespace WindowsFormsApplication1
             InitializeDefaultTimerInterval();
 
             _inLongRest = false;
-            _lastLongRestTime = _lastShortRestTime = DateTime.Now;
-            lblLongRest.Visible = false;
-            timerSeconds.Enabled = false;
             _longRestEndsIn = TimeSpan.Zero;
 
+            lblLongRest.Visible = false;
+            timerSeconds.Enabled = false;
+
+            ResetLastLongRestTime();
+            ResetLastShortRestTime();
+
             Hide();
+        }
+
+        private void ResetLastLongRestTime()
+        {
+            _lastLongRestTime = DateTime.Now;
+        }
+
+        private void ResetLastShortRestTime()
+        {
+            _lastShortRestTime = DateTime.Now;
         }
 
         private void StartRest(bool longRest)
@@ -103,7 +116,7 @@ namespace WindowsFormsApplication1
             }
             else
             {
-                _lastShortRestTime = DateTime.Now;
+                ResetLastShortRestTime();
             }
 
             lblLongRestEndsIn.Visible = _inLongRest;
@@ -126,7 +139,7 @@ namespace WindowsFormsApplication1
         private DateTime GetNextLongRestStart()
         {
             return _allowLongRest 
-                ? _lastLongRestTime + LongRestInterval
+                ? _lastLongRestTime + _longRestInterval
                 : DateTime.MaxValue;
         }
 
@@ -200,6 +213,7 @@ namespace WindowsFormsApplication1
         private void mnuiAllowLongRest_Click(object sender, EventArgs e)
         {
             _allowLongRest = mnuiAllowLongRest.Checked;
+            mnuiLongRestSchemes.Enabled = mnuiAllowLongRest.Checked;
         }
 
         private void timerSeconds_Tick(object sender, EventArgs e)
@@ -221,6 +235,75 @@ namespace WindowsFormsApplication1
             else
             {
                 icoTray.Text = "DISABLED";
+            }
+        }
+
+        private void mnuiLongRestScheme_Clicked(object sender, EventArgs e)
+        {
+            var mnui = (ToolStripMenuItem)sender;
+
+            mnuiLongRestScheme17_3.Checked = false;
+            mnuiLongRestScheme25_5.Checked = false;
+            mnuiLongRestScheme45_15.Checked = false;
+            mnuiLongRestSchemeCustom.Checked = false;
+
+            mnui.Checked = true;
+        }
+
+        private void mnuiLongRestScheme45_15_CheckedChanged(object sender, EventArgs e)
+        {
+            if (mnuiLongRestScheme45_15.Checked)
+            {
+                SetLongRestParameters(45, 15);
+            }
+        }
+
+        private void mnuiLongRestScheme25_5_CheckedChanged(object sender, EventArgs e)
+        {
+            if (mnuiLongRestScheme25_5.Checked)
+            {
+                SetLongRestParameters(25, 5);
+            }
+        }
+
+        private void mnuiLongRestScheme17_3_CheckedChanged(object sender, EventArgs e)
+        {
+            if (mnuiLongRestScheme17_3.Checked)
+            {
+                SetLongRestParameters(17, 3);
+            }
+        }
+
+        private void mnuiLongRestSchemeCustom_CheckedChanged(object sender, EventArgs e)
+        {
+            if (mnuiLongRestSchemeCustom.Checked)
+            {
+                SetLongRestParametersFromConfig();
+            }
+        }
+
+        private void SetLongRestParameters(int interval, int duration)
+        {
+            _longRestDuration = TimeSpan.FromMinutes(duration);
+            _longRestInterval = TimeSpan.FromMinutes(interval);
+        }
+
+        private void SetLongRestParametersFromConfig()
+        {
+            _longRestDuration = TimeSpan.Parse(ConfigurationManager.AppSettings["LongRestDuration"]);
+            _longRestInterval = TimeSpan.Parse(ConfigurationManager.AppSettings["LongRestInterval"]);
+        }
+
+        private void mnuiReset_Click(object sender, EventArgs e)
+        {
+            if (_inLongRest)
+            {
+                FinishLongRest();
+            }
+            else
+            {
+                ResetLastLongRestTime();
+                ResetLastShortRestTime();
             }
         }
     }
