@@ -11,7 +11,7 @@ namespace WindowsFormsApplication1
     {
         // ShortRestDuration is the same
         private TimeSpan _timerResolutionInterval;
-        private readonly TimeSpan AutoReenableInterval = TimeSpan.FromHours(1);
+        private TimeSpan AutoReenableInterval = TimeSpan.FromHours(1);
         private readonly TimeSpan ShortRestInterval = TimeSpan.FromMinutes(5);
 
         private TimeSpan _longRestInterval;
@@ -298,6 +298,41 @@ namespace WindowsFormsApplication1
         {
             _longRestDuration = TimeSpan.FromMinutes(duration);
             _longRestInterval = TimeSpan.FromMinutes(interval);
+        }
+
+        private void mnuiReenableSwitch_Click(object sender, EventArgs e)
+        {
+            var mnui = (ToolStripMenuItem)sender;
+
+            mnuiReenableIn1Hour.Checked = false;
+            mnuiReenableIn2Hours.Checked = false;
+            mnuiReenableNever.Checked = false;
+
+            mnui.Checked = true;
+        }
+
+        private void mnuiReenableNever_CheckedChanged(object sender, EventArgs e)
+        {
+            if (mnuiReenableNever.Checked)
+            {
+                AutoReenableInterval = TimeSpan.MaxValue;
+            }
+        }
+
+        private void mnuiReenableIn1Hour_CheckedChanged(object sender, EventArgs e)
+        {
+            if (mnuiReenableIn1Hour.Checked)
+            {
+                AutoReenableInterval = TimeSpan.FromHours(1);
+            }
+        }
+
+        private void mnuiReenableIn2Hours_CheckedChanged(object sender, EventArgs e)
+        {
+            if (mnuiReenableIn2Hours.Checked)
+            {
+                AutoReenableInterval = TimeSpan.FromHours(2);
+            }
         }
 
         private void SetLongRestParametersFromConfig()

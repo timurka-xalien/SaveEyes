@@ -33,6 +33,7 @@
             this.lblLongRest = new System.Windows.Forms.Label();
             this.icoTray = new System.Windows.Forms.NotifyIcon(this.components);
             this.mnuTrayMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.mnuiReset = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuiAllowLongRest = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuiLongRestSchemes = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuiLongRestScheme45_15 = new System.Windows.Forms.ToolStripMenuItem();
@@ -41,14 +42,16 @@
             this.mnuiLongRestSchemeCustom = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.mnuiDisable = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuiReenableIn = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuiReenableNever = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuiReenableIn2Hours = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuiReenableIn1Hour = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuiExit = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuiLongRest = new System.Windows.Forms.ToolStripMenuItem();
             this.timer = new System.Windows.Forms.Timer(this.components);
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.lblLongRestEndsIn = new System.Windows.Forms.Label();
             this.timerSeconds = new System.Windows.Forms.Timer(this.components);
-            this.mnuiLongRestHeader = new System.Windows.Forms.ToolStripMenuItem();
-            this.mnuiReset = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuTrayMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -81,15 +84,22 @@
             // 
             this.mnuTrayMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.mnuTrayMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mnuiLongRestHeader,
             this.mnuiReset,
             this.mnuiAllowLongRest,
             this.mnuiLongRestSchemes,
             this.toolStripSeparator1,
             this.mnuiDisable,
+            this.mnuiReenableIn,
             this.mnuiExit});
             this.mnuTrayMenu.Name = "contextMenuStrip1";
-            this.mnuTrayMenu.Size = new System.Drawing.Size(176, 194);
+            this.mnuTrayMenu.Size = new System.Drawing.Size(206, 166);
+            // 
+            // mnuiReset
+            // 
+            this.mnuiReset.Name = "mnuiReset";
+            this.mnuiReset.Size = new System.Drawing.Size(205, 26);
+            this.mnuiReset.Text = "Long Rest Reset";
+            this.mnuiReset.Click += new System.EventHandler(this.mnuiReset_Click);
             // 
             // mnuiAllowLongRest
             // 
@@ -97,8 +107,8 @@
             this.mnuiAllowLongRest.CheckOnClick = true;
             this.mnuiAllowLongRest.CheckState = System.Windows.Forms.CheckState.Checked;
             this.mnuiAllowLongRest.Name = "mnuiAllowLongRest";
-            this.mnuiAllowLongRest.Size = new System.Drawing.Size(175, 26);
-            this.mnuiAllowLongRest.Text = "Allow";
+            this.mnuiAllowLongRest.Size = new System.Drawing.Size(205, 26);
+            this.mnuiAllowLongRest.Text = "Long Rest Allow";
             this.mnuiAllowLongRest.Click += new System.EventHandler(this.mnuiAllowLongRest_Click);
             // 
             // mnuiLongRestSchemes
@@ -109,8 +119,8 @@
             this.mnuiLongRestScheme17_3,
             this.mnuiLongRestSchemeCustom});
             this.mnuiLongRestSchemes.Name = "mnuiLongRestSchemes";
-            this.mnuiLongRestSchemes.Size = new System.Drawing.Size(175, 26);
-            this.mnuiLongRestSchemes.Text = "Schemes";
+            this.mnuiLongRestSchemes.Size = new System.Drawing.Size(205, 26);
+            this.mnuiLongRestSchemes.Text = "Long Rest Schemes";
             // 
             // mnuiLongRestScheme45_15
             // 
@@ -149,19 +159,55 @@
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(172, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(202, 6);
             // 
             // mnuiDisable
             // 
             this.mnuiDisable.Name = "mnuiDisable";
-            this.mnuiDisable.Size = new System.Drawing.Size(175, 26);
+            this.mnuiDisable.Size = new System.Drawing.Size(205, 26);
             this.mnuiDisable.Text = "Disable";
             this.mnuiDisable.Click += new System.EventHandler(this.disableToolStripMenuItem_Click);
+            // 
+            // mnuiReenableIn
+            // 
+            this.mnuiReenableIn.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mnuiReenableNever,
+            this.mnuiReenableIn2Hours,
+            this.mnuiReenableIn1Hour});
+            this.mnuiReenableIn.Name = "mnuiReenableIn";
+            this.mnuiReenableIn.Size = new System.Drawing.Size(205, 26);
+            this.mnuiReenableIn.Text = "Reenable in";
+            // 
+            // mnuiReenableNever
+            // 
+            this.mnuiReenableNever.Name = "mnuiReenableNever";
+            this.mnuiReenableNever.Size = new System.Drawing.Size(181, 26);
+            this.mnuiReenableNever.Text = "Never";
+            this.mnuiReenableNever.CheckedChanged += new System.EventHandler(this.mnuiReenableNever_CheckedChanged);
+            this.mnuiReenableNever.Click += new System.EventHandler(this.mnuiReenableSwitch_Click);
+            // 
+            // mnuiReenableIn2Hours
+            // 
+            this.mnuiReenableIn2Hours.Name = "mnuiReenableIn2Hours";
+            this.mnuiReenableIn2Hours.Size = new System.Drawing.Size(181, 26);
+            this.mnuiReenableIn2Hours.Text = "2 hours";
+            this.mnuiReenableIn2Hours.CheckedChanged += new System.EventHandler(this.mnuiReenableIn2Hours_CheckedChanged);
+            this.mnuiReenableIn2Hours.Click += new System.EventHandler(this.mnuiReenableSwitch_Click);
+            // 
+            // mnuiReenableIn1Hour
+            // 
+            this.mnuiReenableIn1Hour.Checked = true;
+            this.mnuiReenableIn1Hour.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.mnuiReenableIn1Hour.Name = "mnuiReenableIn1Hour";
+            this.mnuiReenableIn1Hour.Size = new System.Drawing.Size(181, 26);
+            this.mnuiReenableIn1Hour.Text = "1 hour";
+            this.mnuiReenableIn1Hour.CheckedChanged += new System.EventHandler(this.mnuiReenableIn1Hour_CheckedChanged);
+            this.mnuiReenableIn1Hour.Click += new System.EventHandler(this.mnuiReenableSwitch_Click);
             // 
             // mnuiExit
             // 
             this.mnuiExit.Name = "mnuiExit";
-            this.mnuiExit.Size = new System.Drawing.Size(175, 26);
+            this.mnuiExit.Size = new System.Drawing.Size(205, 26);
             this.mnuiExit.Text = "Exit";
             this.mnuiExit.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -199,19 +245,6 @@
             // 
             this.timerSeconds.Interval = 1000;
             this.timerSeconds.Tick += new System.EventHandler(this.timerSeconds_Tick);
-            // 
-            // mnuiLongRestHeader
-            // 
-            this.mnuiLongRestHeader.Name = "mnuiLongRestHeader";
-            this.mnuiLongRestHeader.Size = new System.Drawing.Size(175, 26);
-            this.mnuiLongRestHeader.Text = "Long Rest";
-            // 
-            // mnuiReset
-            // 
-            this.mnuiReset.Name = "mnuiReset";
-            this.mnuiReset.Size = new System.Drawing.Size(175, 26);
-            this.mnuiReset.Text = "Reset";
-            this.mnuiReset.Click += new System.EventHandler(this.mnuiReset_Click);
             // 
             // RestForm
             // 
@@ -258,8 +291,11 @@
         private System.Windows.Forms.ToolStripMenuItem mnuiLongRestSchemes;
         private System.Windows.Forms.ToolStripMenuItem mnuiLongRestSchemeCustom;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ToolStripMenuItem mnuiLongRestHeader;
         private System.Windows.Forms.ToolStripMenuItem mnuiReset;
+        private System.Windows.Forms.ToolStripMenuItem mnuiReenableIn;
+        private System.Windows.Forms.ToolStripMenuItem mnuiReenableIn1Hour;
+        private System.Windows.Forms.ToolStripMenuItem mnuiReenableIn2Hours;
+        private System.Windows.Forms.ToolStripMenuItem mnuiReenableNever;
     }
 }
 
