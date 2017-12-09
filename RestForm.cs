@@ -196,6 +196,12 @@ namespace WindowsFormsApplication1
             {
                 Hide();
             }
+            
+            if (_enabled)
+            {
+                ResetLastLongRestTime();
+                ResetLastShortRestTime();
+            }
         }
 
         protected override void OnVisibleChanged(EventArgs e)
