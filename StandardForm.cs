@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
+using SaveEyes;
 using SaveEyes.Properties;
 
 namespace WindowsFormsApplication1
@@ -12,8 +13,7 @@ namespace WindowsFormsApplication1
         // ShortRestDuration is the same
         private TimeSpan _timerResolutionInterval;
         private TimeSpan AutoReenableInterval = TimeSpan.FromHours(1);
-        private readonly TimeSpan ShortRestInterval = TimeSpan.FromMinutes(5);
-
+        private readonly TimeSpan ShortRestInterval = TimeSpan.FromMinutes(1);
         private TimeSpan _longRestInterval;
         private TimeSpan _longRestDuration;
         private TimeSpan _longRestEndsIn;
@@ -27,6 +27,9 @@ namespace WindowsFormsApplication1
         private bool _enabled = true;
         private int _lastIndex;
 
+        private Form _form;
+        private HiddenForm _hiddenForm;
+
         public RestForm()
         {
             InitializeComponent();
@@ -38,6 +41,9 @@ namespace WindowsFormsApplication1
             ResetLastShortRestTime();
 
             Visible = false;
+
+            _form = this;
+            _hiddenForm = new HiddenForm();
         }
 
         private void InitializeDefaultTimerInterval()
@@ -74,7 +80,7 @@ namespace WindowsFormsApplication1
 
         private void FinishShortRest()
         {
-            Hide();
+            _form.Hide();
         }
 
         private void FinishLongRest()
@@ -90,7 +96,7 @@ namespace WindowsFormsApplication1
             ResetLastLongRestTime();
             ResetLastShortRestTime();
 
-            Hide();
+            _form.Hide();
         }
 
         private void ResetLastLongRestTime()
@@ -103,26 +109,29 @@ namespace WindowsFormsApplication1
             _lastShortRestTime = DateTime.Now;
         }
 
-        private void StartRest(bool longRest)
+        private void StartRest(bool longRest)  // Either long or short
         {
             if (longRest)
             {
                 _inLongRest = true;
                 timer.Interval = (int)_longRestDuration.TotalMilliseconds;
                 timerSeconds.Enabled = true;
-                lblLongRest.Visible = true;
                 _longRestEndsIn = _longRestDuration;
-                lblLongRestEndsIn.Text = _longRestEndsIn.ToString(@"mm\:ss");
+
+                UpdateLongRestEndsInLabel();
             }
             else
             {
                 ResetLastShortRestTime();
             }
 
-            lblLongRestEndsIn.Visible = _inLongRest;
+            lblLongRest.Visible = !mnuiSemiHiddenMode.Checked && longRest;
+            lblLongRestEndsIn.Visible = !mnuiSemiHiddenMode.Checked && longRest;
+            pictCat.Visible = !mnuiSemiHiddenMode.Checked || !longRest;
 
             SetImage();
-            Show();
+
+            _form.Show();
         }
 
         private bool IsTimeToLongRest()
@@ -156,11 +165,11 @@ namespace WindowsFormsApplication1
             if (!Visible)
             {
                 SetImage();
-                Show();
+                _form.Show();
             }
             else
             {
-                Hide();
+                _form.Hide();
             }
         }
 
@@ -175,9 +184,8 @@ namespace WindowsFormsApplication1
 
         private void SetImage()
         {
-            Bitmap bmp =
-                (Bitmap)Resources.ResourceManager.GetObject("a" + _lastIndex);
-            pictureBox1.Image = bmp;
+            Bitmap bmp = (Bitmap)Resources.ResourceManager.GetObject("a" + _lastIndex);
+            pictCat.Image = bmp;
             _lastIndex = (_lastIndex + 1) % 6;
         }
 
@@ -194,7 +202,7 @@ namespace WindowsFormsApplication1
 
             if (!_enabled)
             {
-                Hide();
+                _form.Hide();
             }
             
             if (_enabled)
@@ -227,8 +235,14 @@ namespace WindowsFormsApplication1
             if (_inLongRest)
             {
                 _longRestEndsIn = _longRestEndsIn - TimeSpan.FromSeconds(1);
-                lblLongRestEndsIn.Text = _longRestEndsIn.ToString(@"mm\:ss");
+                UpdateLongRestEndsInLabel();
             }
+        }
+
+        private void UpdateLongRestEndsInLabel()
+        {
+            lblLongRestEndsIn.Text = _longRestEndsIn.ToString(@"mm\:ss");
+            _hiddenForm.UpdateTimerLabel(_longRestEndsIn);
         }
 
         private void icoTray_MouseMove(object sender, MouseEventArgs e)
@@ -343,6 +357,8 @@ namespace WindowsFormsApplication1
 
         private void mnuiReset_Click(object sender, EventArgs e)
         {
+            FinishShortRest();
+
             if (_inLongRest)
             {
                 FinishLongRest();
@@ -352,6 +368,51 @@ namespace WindowsFormsApplication1
                 ResetLastLongRestTime();
                 ResetLastShortRestTime();
             }
+        }
+
+        private void mnuiHiddenMode_CheckedChanged(object sender, EventArgs e)
+        {
+            if (mnuiHiddenMode.Checked)
+            {
+                mnuiSemiHiddenMode.Checked = false;
+            }
+
+            _form.Hide();
+
+            if (mnuiHiddenMode.Checked)
+            {
+                _form = _hiddenForm;
+            }
+            else
+            {
+                _form = this;
+            }
+        }
+
+        private void mnuiSemiHiddenMode_Click(object sender, EventArgs e)
+        {
+            if (mnuiSemiHiddenMode.Checked)
+            {
+                mnuiHiddenMode.Checked = false;
+            }
+
+            if (_inLongRest)
+            {
+                lblLongRest.Visible = !mnuiSemiHiddenMode.Checked;
+                lblLongRestEndsIn.Visible = !mnuiSemiHiddenMode.Checked;
+                pictCat.Visible = !mnuiSemiHiddenMode.Checked;
+            }
+        }
+
+        private void mnuiLongRestNow_Click(object sender, EventArgs e)
+        {
+            _lastLongRestTime = DateTime.Now - _longRestInterval;
+            timer_Tick(null, null);
+        }
+
+        private void mnuiLongRestIn5Minutes_Click(object sender, EventArgs e)
+        {
+            _lastLongRestTime = DateTime.Now - _longRestInterval + TimeSpan.FromMinutes(5);
         }
     }
 }

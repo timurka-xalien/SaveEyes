@@ -75,16 +75,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="RestForm.cs">
+    <Compile Include="HiddenForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="RestForm.Designer.cs">
-      <DependentUpon>RestForm.cs</DependentUpon>
+    <Compile Include="HiddenForm.Designer.cs">
+      <DependentUpon>HiddenForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StandardForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StandardForm.Designer.cs">
+      <DependentUpon>StandardForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="RestForm.resx">
-      <DependentUpon>RestForm.cs</DependentUpon>
+    <EmbeddedResource Include="HiddenForm.resx">
+      <DependentUpon>HiddenForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StandardForm.resx">
+      <DependentUpon>StandardForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
