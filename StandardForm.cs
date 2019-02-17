@@ -140,15 +140,16 @@ namespace WindowsFormsApplication1
 
             Trace.WriteLine($"Next long rest {nextLongRest}");
 
-            return !Visible &&
-                _allowLongRest &&
-                nextLongRest < DateTime.Now;
+            return !Visible && _allowLongRest && nextLongRest <= DateTime.Now;
         }
 
         private DateTime GetNextLongRestStart()
         {
+            var nextLongRest = _lastLongRestTime + _longRestInterval;
+            nextLongRest = nextLongRest < DateTime.Now ? DateTime.Now : nextLongRest;
+
             return _allowLongRest 
-                ? _lastLongRestTime + _longRestInterval
+                ? nextLongRest
                 : DateTime.MaxValue;
         }
 
