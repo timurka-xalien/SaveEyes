@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using SaveEyes;
 using SaveEyes.Properties;
@@ -13,7 +14,7 @@ namespace WindowsFormsApplication1
         // ShortRestDuration is the same
         private TimeSpan _timerResolutionInterval;
         private TimeSpan AutoReenableInterval = TimeSpan.FromHours(1);
-        private readonly TimeSpan ShortRestInterval = TimeSpan.FromMinutes(1);
+        private readonly TimeSpan ShortRestInterval = TimeSpan.FromMinutes(5);
         private TimeSpan _longRestInterval;
         private TimeSpan _longRestDuration;
         private TimeSpan _longRestEndsIn;
@@ -30,11 +31,15 @@ namespace WindowsFormsApplication1
         private Form _form;
         private HiddenForm _hiddenForm;
 
+        private ToolStripMenuItem[] _poses;
+        private string _lastPose;
+
         public RestForm()
         {
             InitializeComponent();
 
             InitializeDefaultTimerInterval();
+            InitializePoses();
             SetLongRestParametersFromConfig();
             SetImage();
             ResetLastLongRestTime();
@@ -44,6 +49,11 @@ namespace WindowsFormsApplication1
 
             _form = this;
             _hiddenForm = new HiddenForm();
+        }
+
+        private void InitializePoses()
+        {
+            _poses = new ToolStripMenuItem[] { mnuiAllowStayPose, mnuiAllowExtraPose, mnuiAllowLayPose, mnuiAllowSitPose };
         }
 
         private void InitializeDefaultTimerInterval()
@@ -128,10 +138,22 @@ namespace WindowsFormsApplication1
             lblLongRest.Visible = !mnuiSemiHiddenMode.Checked && longRest;
             lblLongRestEndsIn.Visible = !mnuiSemiHiddenMode.Checked && longRest;
             pictCat.Visible = !mnuiSemiHiddenMode.Checked || !longRest;
+            lblPose.Visible = longRest;
+
+            DefinePose();
 
             SetImage();
 
             _form.Show();
+        }
+
+        private void DefinePose()
+        {
+            var enabledPoses = _poses.Where(p => p.Checked).Select(p => (string)p.Tag).ToList();
+            var nextPoseIndex = enabledPoses.IndexOf(_lastPose) + 1;
+            nextPoseIndex = nextPoseIndex <= enabledPoses.Count - 1 ? nextPoseIndex : 0;
+            lblPose.Text = (string)_poses[nextPoseIndex].Tag;
+            _lastPose = lblPose.Text;
         }
 
         private bool IsTimeToLongRest()
@@ -146,7 +168,7 @@ namespace WindowsFormsApplication1
         private DateTime GetNextLongRestStart()
         {
             var nextLongRest = _lastLongRestTime + _longRestInterval;
-            nextLongRest = nextLongRest < DateTime.Now ? DateTime.Now : nextLongRest;
+            nextLongRest = nextLongRest <= DateTime.Now ? DateTime.Now : nextLongRest;
 
             return _allowLongRest 
                 ? nextLongRest
@@ -413,6 +435,16 @@ namespace WindowsFormsApplication1
 
         private void mnuiLongRestIn5Minutes_Click(object sender, EventArgs e)
         {
+            LongRestIn5Minutes();
+        }
+
+        private void LongRestIn5Minutes()
+        {
+            if (_inLongRest)
+            {
+                FinishLongRest();
+            }
+
             _lastLongRestTime = DateTime.Now - _longRestInterval + TimeSpan.FromMinutes(5);
         }
     }
